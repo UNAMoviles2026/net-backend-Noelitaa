@@ -52,3 +52,7 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+Services/ReservationService.cs
+Services/ReservationService.cs
+Services/ReservationService.cs
+Services/IReservationService.cs
