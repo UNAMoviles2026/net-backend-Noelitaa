@@ -45,4 +45,17 @@ public class ReservationsController : ControllerBase
       throw;
     }
   }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var result = await _reservationService.DeleteAsync(id);
+
+        if (!result.Success)
+        {
+            return NotFound(result);
+        }
+
+        return NoContent();
+    }
 }

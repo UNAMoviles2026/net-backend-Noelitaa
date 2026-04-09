@@ -42,4 +42,27 @@ public class ReservationService : IReservationService
     return existingReservations.Any(r =>
         startTime < r.EndTime && endTime > r.StartTime);
   }
+
+    public async Task<DeleteReservationResponse> DeleteAsync(Guid id)
+    {
+        var reservation = await _reservationRepository.GetByIdAsync(id);
+        if (reservation == null)
+        {
+            return new DeleteReservationResponse
+            {
+                Success = false,
+                Message = $"Reservation with ID {id} not found.",
+                ReservationId = id
+            };
+        }
+
+        await _reservationRepository.DeleteAsync(reservation);
+
+        return new DeleteReservationResponse
+        {
+            Success = true,
+            Message = "Reservation cancelled successfully.",
+            ReservationId = reservation.Id
+        };
+    }
 }
