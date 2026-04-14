@@ -122,3 +122,5 @@ dotnet ef database update
 - Login failed for user 'sa': confirm the container is using `YourStrong@Pass123` and that the connection string matches it exactly.
 - Invalid connection string: verify the server, database, username, password, and `TrustServerCertificate=True` values in `appsettings.json`.
 - Missing migrations: run `dotnet ef migrations add InitialCreate` if no migration files exist yet, then run `dotnet ef database update`.
+
+
