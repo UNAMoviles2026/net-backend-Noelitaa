@@ -28,16 +28,12 @@ public class ReservationRepository : IReservationRepository
         .ToListAsync();
   }
 
-    public async Task<Reservation?> GetByIdAsync(Guid id)
-    {
-        return await _context.Reservations
-            .FirstOrDefaultAsync(r => r.Id == id);
-    }
-
-    public async Task<bool> DeleteAsync(Reservation reservation)
-    {
-        _context.Reservations.Remove(reservation);
-        await _context.SaveChangesAsync();
-        return true;
-    }
+  public async Task<List<Reservation>> GetByDateAsync(DateOnly date)
+  {
+    return await _context.Reservations
+        .AsNoTracking()
+        .Where(r => r.Date == date)
+        .OrderBy(r => r.StartTime)
+        .ToListAsync();
+  }
 }

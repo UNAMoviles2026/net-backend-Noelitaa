@@ -4,15 +4,20 @@ using reservations_api.Mappers;
 using reservations_api.Models.Entities;
 using reservations_api.Repositories;
 
+
 namespace reservations_api.Services;
 
 public class ReservationService : IReservationService
 {
   private readonly IReservationRepository _reservationRepository;
+  private readonly IClassroomRepository _classroomRepository;  
 
-  public ReservationService(IReservationRepository reservationRepository)
+
+  public ReservationService(IReservationRepository reservationRepository, IClassroomRepository classroomRepository)
   {
     _reservationRepository = reservationRepository;
+    _classroomRepository = classroomRepository;  
+
   }
 
   public async Task<ReservationResponse> CreateAsync(CreateReservationRequest request)
@@ -43,26 +48,32 @@ public class ReservationService : IReservationService
         startTime < r.EndTime && endTime > r.StartTime);
   }
 
-    public async Task<DeleteReservationResponse> DeleteAsync(Guid id)
+  public async Task<GetReservationsByDateResponse> GetByDateAsync(DateOnly date)
+{
+    var reservations = await _reservationRepository.GetByDateAsync(date);
+    
+    var reservationDtos = new List<ReservationDto>();
+    
+    foreach (var reservation in reservations)
     {
-        var reservation = await _reservationRepository.GetByIdAsync(id);
-        if (reservation == null)
+        var classroom = await _classroomRepository.GetByIdAsync(reservation.ClassroomId);
+        
+        reservationDtos.Add(new ReservationDto
         {
-            return new DeleteReservationResponse
-            {
-                Success = false,
-                Message = $"Reservation with ID {id} not found.",
-                ReservationId = id
-            };
-        }
-
-        await _reservationRepository.DeleteAsync(reservation);
-
-        return new DeleteReservationResponse
-        {
-            Success = true,
-            Message = "Reservation cancelled successfully.",
-            ReservationId = reservation.Id
-        };
+            Id = reservation.Id,
+            ClassroomId = reservation.ClassroomId,
+            ClassroomName = classroom?.Name ?? "Unknown",
+            Date = reservation.Date,
+            StartTime = reservation.StartTime,
+            EndTime = reservation.EndTime
+        });
     }
+    
+    return new GetReservationsByDateResponse
+    {
+        Reservations = reservationDtos,
+        Total = reservationDtos.Count,
+        Date = date
+    };
+}
 }
